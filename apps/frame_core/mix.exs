@@ -17,10 +17,19 @@ defmodule FrameCore.MixProject do
 
   # Run "mix help compile.app" to learn about applications.
   def application do
-    [
-      extra_applications: [:logger],
-      mod: {FrameCore.Application, []}
-    ]
+    case Mix.env() do
+      :prod ->
+        [
+          extra_applications: [:logger],
+          mod: {FrameCore.Application, []}
+        ]
+
+      :test ->
+        [extra_applications: [:logger, :mox]]
+
+      _ ->
+        [extra_applications: [:logger]]
+    end
   end
 
   # Run "mix help deps" to learn about dependencies.
