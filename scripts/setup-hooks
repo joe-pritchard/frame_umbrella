@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+set -euo pipefail
+# Configure git to use the repository-local hooks in `.githooks`
+git config core.hooksPath .githooks
+echo "Configured git to use .githooks as hooks path"

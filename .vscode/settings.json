@@ -1,0 +1,38 @@
+{
+    // Line endings - LF for Linux embedded target
+    "files.eol": "\n",
+    // Elixir formatting
+    "elixir.formatOnSave": true,
+    "[elixir]": {
+        "files.eol": "\n",
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "JakeBecker.elixir-ls"
+    },
+    // Run Credo on save
+    "emeraldwalk.runonsave": {
+        "commands": [
+            {
+                "match": "\\.exs?$",
+                "cmd": "mix credo suggest ${file} --format=flycheck"
+            }
+        ]
+    },
+    // ElixirLS configuration
+    "elixirLS.dialyzerEnabled": true,
+    "elixirLS.suggestSpecs": true,
+    "elixirLS.signatureAfterComplete": true,
+    // Show problems inline
+    "problems.decorations.enabled": true,
+    // Exclude build artifacts from file watcher
+    "files.watcherExclude": {
+        "**/_build/**": true,
+        "**/deps/**": true,
+        "**/.elixir_ls/**": true
+    },
+    // Coverage Gutters configuration
+    "coverage-gutters.coverageFileNames": [
+        "frame_core.covertool.xml"
+    ],
+    "coverage-gutters.showLineCoverage": true,
+    "coverage-gutters.showRulerCoverage": true
+}
