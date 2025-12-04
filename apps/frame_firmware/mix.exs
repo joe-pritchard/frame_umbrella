@@ -23,6 +23,10 @@ defmodule FrameFirmware.MixProject do
     [
       app: @app,
       version: @version,
+      build_path: "../../_build",
+      config_path: "../../config/config.exs",
+      deps_path: "../../deps",
+      lockfile: "../../mix.lock",
       elixir: "~> 1.19",
       archives: [nerves_bootstrap: "~> 1.14"],
       start_permanent: Mix.env() == :prod,
@@ -37,10 +41,19 @@ defmodule FrameFirmware.MixProject do
 
   # Run "mix help compile.app" to learn about applications.
   def application do
-    [
-      extra_applications: [:logger, :runtime_tools],
-      mod: {FrameFirmware.Application, []}
-    ]
+    case Mix.env() do
+      :prod ->
+        [
+          extra_applications: [:logger, :runtime_tools],
+          mod: {FrameFirmware.Application, []}
+        ]
+
+      :test ->
+        [extra_applications: [:logger, :mox]]
+
+      _ ->
+        [extra_applications: [:logger, :runtime_tools]]
+    end
   end
 
   # Run "mix help deps" to learn about dependencies.
@@ -54,6 +67,7 @@ defmodule FrameFirmware.MixProject do
       {:vintage_net, "~> 0.13"},
       {:vintage_net_wifi, "~> 0.12"},
       {:vintage_net_wizard, "~> 0.4"},
+      {:frame_core, in_umbrella: true},
 
       # Allow Nerves.Runtime on host to support development, testing and CI.
       # See config/host.exs for usage.
