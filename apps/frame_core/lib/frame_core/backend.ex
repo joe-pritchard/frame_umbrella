@@ -113,7 +113,7 @@ defmodule FrameCore.Backend do
     end
   end
 
-  ## todo: make async using Task.supervisor?
+  ## make async using Task.supervisor?
   @impl true
   @spec handle_call(
           {:download_file, String.t()},
