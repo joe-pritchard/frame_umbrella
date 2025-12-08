@@ -9,6 +9,9 @@
 # move said applications out of the umbrella.
 import Config
 
+import_config "../apps/frame_firmware/config/config.exs"
+import_config "../apps/frame_ui/config/config.exs"
+
 # Sample configuration:
 #
 #     config :logger, :default_handler,

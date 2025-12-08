@@ -28,7 +28,7 @@ defmodule FrameFirmware.MixProject do
       deps_path: "../../deps",
       lockfile: "../../mix.lock",
       elixir: "~> 1.19",
-      archives: [nerves_bootstrap: "~> 1.14"],
+      archives: [nerves_bootstrap: "~> 1.13"],
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       releases: [{@app, release()}]
@@ -68,6 +68,7 @@ defmodule FrameFirmware.MixProject do
       {:vintage_net_wifi, "~> 0.12"},
       {:vintage_net_wizard, "~> 0.4"},
       {:frame_core, in_umbrella: true},
+      {:frame_ui, in_umbrella: true},
 
       # Allow Nerves.Runtime on host to support development, testing and CI.
       # See config/host.exs for usage.

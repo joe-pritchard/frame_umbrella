@@ -2,6 +2,14 @@ import Config
 
 # Add configuration that is only needed when running on the host here.
 
+config :vintage_net_wizard,
+  backend: VintageNetWizard.Backend.Mock
+
+config :vintage_net,
+  resolvconf: "/dev/null",
+  persistence: VintageNet.Persistence.Null,
+  bin_ip: "false"
+
 config :nerves_runtime,
   kv_backend:
     {Nerves.Runtime.KVBackend.InMemory,

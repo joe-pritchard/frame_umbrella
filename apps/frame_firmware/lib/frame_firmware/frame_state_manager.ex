@@ -8,6 +8,12 @@ defmodule FrameFirmware.FrameStateManager do
 
   defmodule State do
     @moduledoc false
+
+    @type t :: %__MODULE__{
+            wifi_configured?: boolean(),
+            device_enrolled?: boolean()
+          }
+
     defstruct wifi_configured?: false, device_enrolled?: false
   end
 
@@ -24,16 +30,44 @@ defmodule FrameFirmware.FrameStateManager do
 
   @impl true
   def handle_info({FrameFirmware.WifiManager, :wifi_configured}, state) do
-    {:noreply, %{state | wifi_configured?: true}}
+    Process.send_after(self(), :check_enrolment, 1_000)
+
+    new_state = %{state | wifi_configured?: true}
+    send(FrameUI.PubSub.FrameState, {:frame_state, new_state})
+
+    {:noreply, new_state}
   end
 
   @impl true
   def handle_info({FrameFirmware.WifiManager, :wifi_unconfigured}, state) do
-    {:noreply, %{state | wifi_configured?: false}}
+    new_state = %{state | wifi_configured?: false}
+    send(FrameUI.PubSub.FrameState, {:frame_state, new_state})
+
+    {:noreply, new_state}
+  end
+
+  @impl true
+  def handle_info(:check_enrolment, %{wifi_configured?: true} = state) do
+    enrolled? = FrameCore.Enrolment.check_enrolment()
+
+    unless enrolled? do
+      Process.send_after(self(), :check_enrolment, 1_000)
+    end
+
+    new_state = %{state | device_enrolled?: enrolled?}
+    send(FrameUI.PubSub.FrameState, {:frame_state, new_state})
+
+    {:noreply, new_state}
+  end
+
+  @impl true
+  def handle_info(:check_enrolment, state) do
+    {:noreply, state}
   end
 
   @impl true
   def handle_info(_msg, state) do
+    Logger.debug("FrameStateManager received unexpected message: #{inspect(_msg)}")
     {:noreply, state}
   end
 end

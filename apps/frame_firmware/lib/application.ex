@@ -39,7 +39,7 @@ defmodule FrameFirmware.Application do
         # {Target.Worker, arg},
         {FrameFirmware.WifiManager, []},
         {FrameFirmware.FrameCoreSupervisor, []},
-        {FrameFirmware.FrameStateManager, []}
+        {FrameFirmware.FrameUISupervisor, []}
       ]
     end
   end
