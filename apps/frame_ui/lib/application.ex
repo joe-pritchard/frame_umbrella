@@ -7,20 +7,11 @@ defmodule FrameUI.Application do
 
   @impl true
   def start(_type, _args) do
-    main_viewport_config =
-      case Application.get_env(:frame_ui, :viewport) do
-        nil ->
-          raise "Missing :frame_ui, :viewport configuration for Scenic"
-
-        config ->
-          Keyword.put(config, :default_scene, {FrameUI.RootScene, nil})
-      end
-
     children = [
       # Starts a worker by calling: FrameUI.Worker.start_link(arg)
       {
         Scenic,
-        [main_viewport_config]
+        [Application.get_env(:frame_ui, :viewport)]
       },
       FrameUI.PubSub.Supervisor
     ]

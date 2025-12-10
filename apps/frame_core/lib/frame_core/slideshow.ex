@@ -89,7 +89,7 @@ defmodule FrameCore.Slideshow do
       images: images
     }
 
-    Logger.info("Slideshow initialized with #{length(images)} images")
+    Logger.info("FrameCore.Slideshow: Slideshow initialized with #{length(images)} images")
 
     {:ok, state}
   end
@@ -100,7 +100,7 @@ defmodule FrameCore.Slideshow do
   def handle_call(:refresh, _from, state) do
     case Backend.fetch_images(state.last_fetch) do
       {:ok, image_data} ->
-        Logger.info("Fetched #{length(image_data)} images from backend")
+        Logger.info("FrameCore.Slideshow: Fetched #{length(image_data)} images from backend")
         # Process each image (download new, delete removed)
         new_state = process_images(image_data, state)
 
@@ -110,11 +110,14 @@ defmodule FrameCore.Slideshow do
 
         new_state = %{new_state | last_fetch: now}
 
-        Logger.info("Refreshed images, new length: #{length(new_state.images)}")
+        Logger.info(
+          "FrameCore.Slideshow: Refreshed images, new length: #{length(new_state.images)}"
+        )
+
         {:reply, :ok, new_state}
 
       {:error, reason} = error ->
-        Logger.warning("Failed to refresh images: #{inspect(reason)}")
+        Logger.warning("FrameCore.Slideshow: Failed to refresh images: #{inspect(reason)}")
         {:reply, error, state}
     end
   end
@@ -125,15 +128,15 @@ defmodule FrameCore.Slideshow do
   def handle_call(:get_random_image, _from, state) do
     case state.images do
       [] ->
-        Logger.debug("No images available for random selection")
+        Logger.debug("FrameCore.Slideshow: No images available for random selection")
         {:reply, {:error, :no_images}, state}
 
       images ->
         random_index = :rand.uniform(length(images) - 1)
 
-        Logger.debug("Selected random image index: #{random_index}")
+        Logger.debug("FrameCore.Slideshow: Selected random image index: #{random_index}")
         image = Enum.at(images, random_index)
-        Logger.debug("image selected: #{image}")
+        Logger.debug("FrameCore.Slideshow: image selected: #{image}")
         {:reply, {:ok, image}, state}
     end
   end
@@ -153,19 +156,19 @@ defmodule FrameCore.Slideshow do
       {:ok, content} ->
         case DateTime.from_iso8601(String.trim(content)) do
           {:ok, datetime, _offset} ->
-            Logger.debug("Loaded last fetch time: #{content}")
+            Logger.debug("FrameCore.Slideshow: Loaded last fetch time: #{content}")
             datetime
 
           {:error, reason} ->
             Logger.debug(
-              "Unable to generate DateTime from last fetch content, returning nil: #{inspect(reason)}"
+              "FrameCore.Slideshow: Unable to generate DateTime from last fetch content, returning nil: #{inspect(reason)}"
             )
 
             nil
         end
 
       {:error, _} ->
-        Logger.debug("last fetch does not exist, returning nil")
+        Logger.debug("FrameCore.Slideshow: last fetch does not exist, returning nil")
         nil
     end
   end
@@ -192,7 +195,7 @@ defmodule FrameCore.Slideshow do
         []
 
       {:error, reason} ->
-        Logger.warning("Failed to scan images directory: #{inspect(reason)}")
+        Logger.warning("FrameCore.Slideshow: Failed to scan images directory: #{inspect(reason)}")
         []
     end
   end
@@ -213,18 +216,23 @@ defmodule FrameCore.Slideshow do
     image_path = get_image_path(image)
 
     if image_path in state.images do
-      Logger.debug("Image #{image_path} already exists, skipping")
+      Logger.debug("FrameCore.Slideshow: Image #{image_path} already exists, skipping")
       state
     else
-      Logger.debug("Downloading image id #{image["id"]} from: #{image["url"]}")
+      Logger.debug(
+        "FrameCore.Slideshow: Downloading image id #{image["id"]} from: #{image["url"]}"
+      )
 
       case download_image(image, image_path, state.file_system) do
         :ok ->
-          Logger.debug("Successfully downloaded #{image_path}, adding to state")
+          Logger.debug(
+            "FrameCore.Slideshow: Successfully downloaded #{image_path}, adding to state"
+          )
+
           %{state | images: [image_path | state.images]}
 
         {:error, reason} ->
-          Logger.warning("Failed to download image: #{inspect(reason)}")
+          Logger.warning("FrameCore.Slideshow: Failed to download image: #{inspect(reason)}")
           state
       end
     end
@@ -236,15 +244,21 @@ defmodule FrameCore.Slideshow do
 
     if image_path in state.images do
       # Remove from file system
-      Logger.debug("Deleting image: #{image_path}")
+      Logger.debug("FrameCore.Slideshow: Deleting image: #{image_path}")
 
       case state.file_system.rm(image_path) do
         :ok ->
-          Logger.debug("Successfully deleted #{image_path}, removing from state")
+          Logger.debug(
+            "FrameCore.Slideshow: Successfully deleted #{image_path}, removing from state"
+          )
+
           %{state | images: List.delete(state.images, image_path)}
 
         {:error, reason} ->
-          Logger.warning("Failed to delete image #{image_path}: #{inspect(reason)}")
+          Logger.warning(
+            "FrameCore.Slideshow: Failed to delete image #{image_path}: #{inspect(reason)}"
+          )
+
           state
       end
     else
@@ -275,16 +289,22 @@ defmodule FrameCore.Slideshow do
         case Backend.download_file(url) do
           {:ok, data} ->
             file_system.write!(destination, data)
-            Logger.info("Downloaded #{url} to #{destination}")
+            Logger.info("FrameCore.Slideshow: Downloaded #{url} to #{destination}")
             :ok
 
           {:error, reason} ->
-            Logger.warning("Failed to download #{url} to #{destination}: #{inspect(reason)}")
+            Logger.warning(
+              "FrameCore.Slideshow: Failed to download #{url} to #{destination}: #{inspect(reason)}"
+            )
+
             {:error, reason}
         end
 
       {:error, reason} ->
-        Logger.warning("Failed to create directory for #{destination}: #{inspect(reason)}")
+        Logger.warning(
+          "FrameCore.Slideshow: Failed to create directory for #{destination}: #{inspect(reason)}"
+        )
+
         {:error, reason}
     end
   end

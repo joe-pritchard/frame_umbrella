@@ -2,6 +2,11 @@ import Config
 
 # Add configuration that is only needed when running on the host here.
 
+# I need to use glfw as the target for scenic when running on host, because cairo doesn't work in WSL atm
+unless System.get_env("SCENIC_TARGET_LOCAL") do
+  System.put_env("SCENIC_TARGET_LOCAL", "glfw")
+end
+
 config :vintage_net_wizard,
   backend: VintageNetWizard.Backend.Mock
 

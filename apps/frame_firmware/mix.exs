@@ -48,6 +48,12 @@ defmodule FrameFirmware.MixProject do
           mod: {FrameFirmware.Application, []}
         ]
 
+      :dev ->
+        [
+          extra_applications: [:logger, :runtime_tools],
+          mod: {FrameFirmware.Application, []}
+        ]
+
       :test ->
         [extra_applications: [:logger, :mox]]
 

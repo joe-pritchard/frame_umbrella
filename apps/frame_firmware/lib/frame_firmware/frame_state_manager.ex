@@ -6,6 +6,8 @@ defmodule FrameFirmware.FrameStateManager do
   use GenServer
   require Logger
 
+  @enrollment_check_interval_ms 60_000
+
   defmodule State do
     @moduledoc false
 
@@ -30,7 +32,7 @@ defmodule FrameFirmware.FrameStateManager do
 
   @impl true
   def handle_info({FrameFirmware.WifiManager, :wifi_configured}, state) do
-    Process.send_after(self(), :check_enrolment, 1_000)
+    Process.send_after(self(), :check_enrolment, @enrollment_check_interval_ms)
 
     new_state = %{state | wifi_configured?: true}
     send(FrameUI.PubSub.FrameState, {:frame_state, new_state})
@@ -51,7 +53,7 @@ defmodule FrameFirmware.FrameStateManager do
     enrolled? = FrameCore.Enrolment.check_enrolment()
 
     unless enrolled? do
-      Process.send_after(self(), :check_enrolment, 1_000)
+      Process.send_after(self(), :check_enrolment, @enrollment_check_interval_ms)
     end
 
     new_state = %{state | device_enrolled?: enrolled?}
@@ -66,8 +68,8 @@ defmodule FrameFirmware.FrameStateManager do
   end
 
   @impl true
-  def handle_info(_msg, state) do
-    Logger.debug("FrameStateManager received unexpected message: #{inspect(_msg)}")
+  def handle_info(msg, state) do
+    Logger.debug("FrameStateManager: received unexpected message: #{inspect(msg)}")
     {:noreply, state}
   end
 end

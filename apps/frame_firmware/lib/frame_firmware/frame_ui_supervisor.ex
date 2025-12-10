@@ -14,8 +14,7 @@ defmodule FrameFirmware.FrameUISupervisor do
   @impl true
   def init(_opts) do
     children = [
-      FrameFirmware.FrameStateManager,
-      FrameUI.Application
+      FrameFirmware.FrameStateManager
     ]
 
     Supervisor.init(children, strategy: :rest_for_one)

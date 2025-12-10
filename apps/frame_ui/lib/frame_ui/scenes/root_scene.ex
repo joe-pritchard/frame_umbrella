@@ -6,6 +6,7 @@ defmodule FrameUI.RootScene do
 
   use Scenic.Scene
   alias Scenic.Graph
+  require Logger
 
   ## PUBLIC API called by UI.Server
 
@@ -15,14 +16,27 @@ defmodule FrameUI.RootScene do
   def init(scene, _current_scene, _opts) do
     Scenic.PubSub.subscribe(:frame_state)
 
-    scene = push_graph(scene, build_graph(:undefined, scene))
+    {width, height} = scene.viewport.size
+    {background, text} = {{220, 220, 220}, :black}
+
+    initial_graph =
+      Graph.build(font_size: 24, font: :roboto)
+      |> Scenic.Primitives.rect({width, height}, fill: background)
+      |> Scenic.Primitives.text("Scene:", translate: {15, 38}, align: :right, fill: text)
+      |> Scenic.Primitives.text(inspect(:undefined), id: :mode_text, translate: {15, 60}, fill: text)
+
+    scene = scene |> assign(graph: initial_graph) |> push_graph(initial_graph)
+
+    Logger.debug("FrameUI.RootScene: initialized with viewport size #{inspect(scene.viewport.size)}")
 
     {:ok, scene}
   end
 
   @doc false
   @impl GenServer
-  def handle_info({{Scenic.PubSub, :data}, {:frame_state, frame_state, _ts}}, scene) do
+  def handle_info({{Scenic.PubSub, :data}, {:frame_state, frame_state, _ts}}, %{assigns: %{graph: graph}} = scene) do
+    Logger.debug("FrameUI.RootScene: received frame state update: #{inspect(frame_state)}")
+
     new_mode =
       cond do
         not frame_state.wifi_configured? and not frame_state.device_enrolled? ->
@@ -40,22 +54,20 @@ defmodule FrameUI.RootScene do
           :undefined
       end
 
-    scene = push_graph(scene, build_graph(new_mode, scene))
+    graph =
+      Graph.modify(graph, :mode_text, fn text_node ->
+        Scenic.Primitives.text(text_node, inspect(new_mode))
+      end)
+
+    scene =
+      scene
+      |> assign(graph: graph)
+      |> push_graph(graph)
 
     {:noreply, scene}
   end
 
   def handle_info({{Scenic.PubSub, :registered}, _}, scene) do
     {:noreply, scene}
-  end
-
-  defp build_graph(mode, scene) do
-    {width, height} = scene.viewport.size
-    {background, text} = {{220, 220, 220}, :black}
-
-    Graph.build(font_size: 24, font: :roboto)
-    |> Scenic.Primitives.rect({width, height}, fill: background)
-    |> Scenic.Primitives.text("Scene:", translate: {15, 38}, align: :right, fill: text)
-    |> Scenic.Primitives.text(inspect(mode), translate: {15, 60}, fill: text)
   end
 end

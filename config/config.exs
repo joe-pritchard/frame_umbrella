@@ -12,6 +12,9 @@ import Config
 import_config "../apps/frame_firmware/config/config.exs"
 import_config "../apps/frame_ui/config/config.exs"
 
+config :frame_core,
+  backend_url: "https://localhost/api"
+
 # Sample configuration:
 #
 #     config :logger, :default_handler,

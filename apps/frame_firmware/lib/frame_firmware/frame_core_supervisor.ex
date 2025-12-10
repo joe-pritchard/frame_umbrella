@@ -15,8 +15,8 @@ defmodule FrameFirmware.FrameCoreSupervisor do
   @impl true
   def init(_opts) do
     children = [
-      FrameCore.DeviceId,
-      FrameCore.Backend,
+      {FrameCore.DeviceId, %FrameCore.DeviceId.Config{}},
+      {FrameCore.Backend, %FrameCore.Backend.Config{client: nil}},
       FrameCore.Enrolment
     ]
 

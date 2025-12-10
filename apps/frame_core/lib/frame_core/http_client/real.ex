@@ -12,19 +12,19 @@ defmodule FrameCore.HttpClient.Real do
   def get_json(url, params) do
     headers = [{"content-type", "application/json"}, {"X-Device-ID", FrameCore.DeviceId.get()}]
 
-    Logger.debug("Making GET request to #{url} with params: #{inspect(params)}")
+    Logger.debug("HttpClient.Real: Making GET request to #{url} with params: #{inspect(params)}")
 
     case Req.get(url, params: params, headers: headers) do
       {:ok, %Req.Response{status: status, body: body}} when status in 200..299 ->
-        Logger.debug("Received successful response with status #{status}")
+        Logger.debug("HttpClient.Real: Received successful response with status #{status}")
         {:ok, body}
 
       {:ok, %Req.Response{status: status}} ->
-        Logger.warning("HTTP error with status #{status}")
+        Logger.warning("HttpClient.Real: HTTP error with status #{status}")
         {:error, {:http_error, status}}
 
       {:error, reason} ->
-        Logger.warning("Request failed with reason: #{inspect(reason)}")
+        Logger.warning("HttpClient.Real: Request failed with reason: #{inspect(reason)}")
         {:error, reason}
     end
   end
@@ -42,6 +42,7 @@ defmodule FrameCore.HttpClient.Real do
         {:error, {:http_error, status}}
 
       {:error, reason} ->
+        Logger.warning("HttpClient.Real: File download failed with reason: #{inspect(reason)}")
         {:error, reason}
     end
   end

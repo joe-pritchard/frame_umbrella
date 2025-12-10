@@ -96,19 +96,21 @@ defmodule FrameCore.Backend do
         ) ::
           {:reply, {:ok, list()} | {:error, term()}, State.t()}
   def handle_call({:fetch_images, last_fetch}, _from, %State{} = state) do
-    Logger.debug("Fetching images from backend with last_fetch: #{inspect(last_fetch)}")
+    Logger.debug(
+      "FrameCore.Backend: Fetching images from backend with last_fetch: #{inspect(last_fetch)}"
+    )
 
     params = build_params(last_fetch)
     url = "#{state.backend_url}/images"
 
     case state.client.get_json(url, params) do
       {:ok, response} ->
-        Logger.debug("Received response from backend: #{inspect(response)}")
+        Logger.debug("FrameCore.Backend: Received response from backend: #{inspect(response)}")
         images = parse_images_response(response)
         {:reply, {:ok, images}, state}
 
       {:error, reason} = error ->
-        Logger.warning("Failed to fetch images: #{inspect(reason)}")
+        Logger.warning("FrameCore.Backend: Failed to fetch images: #{inspect(reason)}")
         {:reply, error, state}
     end
   end
@@ -122,15 +124,21 @@ defmodule FrameCore.Backend do
         ) ::
           {:reply, {:ok, binary()} | {:error, term()}, State.t()}
   def handle_call({:download_file, url}, _from, %State{} = state) do
-    Logger.debug("Downloading file from URL: #{url}")
+    Logger.debug("FrameCore.Backend: Downloading file from URL: #{url}")
 
     case state.client.get_file(url) do
       {:ok, body} ->
-        Logger.debug("Successfully downloaded file with length: #{byte_size(body)}")
+        Logger.debug(
+          "FrameCore.Backend: Successfully downloaded file with length: #{byte_size(body)}"
+        )
+
         {:reply, {:ok, body}, state}
 
       {:error, reason} = error ->
-        Logger.warning("Failed to download file from #{url}: #{inspect(reason)}")
+        Logger.warning(
+          "FrameCore.Backend: Failed to download file from #{url}: #{inspect(reason)}"
+        )
+
         {:reply, error, state}
     end
   end

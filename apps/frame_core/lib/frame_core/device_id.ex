@@ -8,7 +8,7 @@ defmodule FrameCore.DeviceId do
 
   use GenServer
 
-  @device_id_path "device_id.txt"
+  @device_id_path "/data/device_id.txt"
 
   defmodule Config do
     @moduledoc """
@@ -56,15 +56,15 @@ defmodule FrameCore.DeviceId do
     case file_system.read(@device_id_path) do
       {:ok, content} ->
         id = String.trim(content)
-        Logger.debug("Loaded existing device ID: #{id}")
+        Logger.debug("FrameCore.DeviceId: Loaded existing device ID: #{id}")
         {:ok, id}
 
       {:error, :enoent} ->
-        Logger.debug("No existing device ID, generating...")
+        Logger.debug("FrameCore.DeviceId: No existing device ID, generating...")
         generate_and_persist_id(file_system)
 
       {:error, reason} ->
-        Logger.warning("Failed to read device ID file: #{inspect(reason)}")
+        Logger.warning("FrameCore.DeviceId: Failed to read device ID file: #{inspect(reason)}")
         {:error, {:device_id_read_failed, reason}}
     end
   end
@@ -74,11 +74,11 @@ defmodule FrameCore.DeviceId do
 
     case persist_id(file_system, new_id) do
       :ok ->
-        Logger.debug("Generated new device ID: #{new_id}")
+        Logger.debug("FrameCore.DeviceId: Generated new device ID: #{new_id}")
         {:ok, new_id}
 
       {:error, reason} ->
-        Logger.warning("Failed to persist device ID: #{inspect(reason)}")
+        Logger.warning("FrameCore.DeviceId: Failed to persist device ID: #{inspect(reason)}")
         {:error, {:device_id_write_failed, reason}}
     end
   end
