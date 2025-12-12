@@ -32,7 +32,7 @@ defmodule FrameUI.MixProject do
       # {:sibling_app_in_umbrella, in_umbrella: true}
       {:scenic, "~> 0.11"},
       scenic_driver_local(),
-      {:qrcode, "~> 0.1.1"}
+      {:qr_code, "~> 3.2.0"}
     ]
   end
 

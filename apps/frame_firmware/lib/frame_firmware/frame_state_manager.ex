@@ -13,10 +13,11 @@ defmodule FrameFirmware.FrameStateManager do
 
     @type t :: %__MODULE__{
             wifi_configured?: boolean(),
-            device_enrolled?: boolean()
+            device_enrolled?: boolean(),
+            ssid: String.t() | nil
           }
 
-    defstruct wifi_configured?: false, device_enrolled?: false
+    defstruct wifi_configured?: false, device_enrolled?: false, ssid: nil
   end
 
   def start_link(opts \\ []) do
@@ -42,7 +43,10 @@ defmodule FrameFirmware.FrameStateManager do
 
   @impl true
   def handle_info({FrameFirmware.WifiManager, :wifi_unconfigured}, state) do
-    new_state = %{state | wifi_configured?: false}
+    ssid = VintageNetWizard.APMode.ssid()
+
+    new_state = %{state | wifi_configured?: false, ssid: ssid}
+
     send(FrameUI.PubSub.FrameState, {:frame_state, new_state})
 
     {:noreply, new_state}
