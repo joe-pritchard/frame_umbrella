@@ -25,6 +25,12 @@ defmodule FrameUI.RootScene do
 
     initial_graph =
       Graph.build(font_size: 24, font: :roboto, fill: text)
+      |> Scenic.Primitives.group(
+        fn graph ->
+          graph
+        end,
+        id: :main_group
+      )
       |> Scenic.Primitives.rect({width, height}, fill: background)
 
     scene = assign(scene, graph: initial_graph, mode: :undefined)
@@ -35,7 +41,6 @@ defmodule FrameUI.RootScene do
   end
 
   @doc false
-
   @impl GenServer
   @dialyzer {:nowarn_function, handle_info: 2}
   def handle_info(
