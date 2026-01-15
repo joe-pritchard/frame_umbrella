@@ -10,7 +10,7 @@ defmodule FrameUI.Scenes.PendingWifi do
   @margin 20
   @cell_size 10
 
-  @spec build_graph(Scenic.Scene.t(), String.t()) :: Scenic.Graph.t()
+  @spec build_graph(Scenic.Scene.t(), String.t() | nil) :: Scenic.Graph.t()
   @doc """
   Given the scene, builds a graph displaying the QR code in the center, based on the scene's viewport size.
   """
@@ -24,19 +24,21 @@ defmodule FrameUI.Scenes.PendingWifi do
     # work out how to center the QR code
     qr_code_transform = {width / 2 - qr_code_size / 2, height / 2 - qr_code_size / 2}
 
-    Graph.modify(
-      scene.assigns.graph,
+    scene.assigns.graph
+    |> Graph.modify(
       :main_group,
       fn group ->
-        Primitive.put(group, fn graph ->
-          graph
-          |> Primitives.text("Pending WiFi Configuration", translate: {@margin, @margin}, fill: :red)
-          |> Primitives.add_specs_to_graph([
-            Primitives.group_spec_r([t: qr_code_transform], create_qr_code(qr.matrix, 0, []))
-          ])
-        end)
+        # first we're just clearing the group of whatever was there before
+        Primitive.put(group, [])
       end
     )
+    |> Graph.add_to(:main_group, fn graph ->
+      graph
+      |> Primitives.text("Pending WiFi Configuration", translate: {@margin, @margin}, fill: :red)
+      |> Primitives.add_specs_to_graph([
+        Primitives.group_spec_r([t: qr_code_transform], create_qr_code(qr.matrix, 0, []))
+      ])
+    end)
   end
 
   @spec create_qr_code([[integer()]], integer(), [Graph.deferred()]) :: [Graph.deferred()]

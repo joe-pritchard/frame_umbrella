@@ -17,6 +17,7 @@ defmodule FrameUI.RootScene do
   ## SCENIC CALLBACKS
 
   @impl Scenic.Scene
+  @spec init(Scenic.Scene.t(), any(), any()) :: {:ok, Scenic.Scene.t()}
   def init(scene, _params, _opts) do
     Scenic.PubSub.subscribe(:frame_state)
 
@@ -24,14 +25,18 @@ defmodule FrameUI.RootScene do
     {background, text} = {{220, 220, 220}, :black}
 
     initial_graph =
-      Graph.build(font_size: 24, font: :roboto, fill: text)
+      Graph.build(font_size: 24, font: :roboto)
+      |> Scenic.Primitives.rect({width, height}, fill: background)
       |> Scenic.Primitives.group(
         fn graph ->
           graph
+          |> Scenic.Primitives.text("Initializing...", fill: text, translate: {20, 40})
         end,
-        id: :main_group
+        id: :main_group,
+        width: width,
+        height: height,
+        translate: {0, 0}
       )
-      |> Scenic.Primitives.rect({width, height}, fill: background)
 
     scene = assign(scene, graph: initial_graph, mode: :undefined)
 
@@ -43,6 +48,10 @@ defmodule FrameUI.RootScene do
   @doc false
   @impl GenServer
   @dialyzer {:nowarn_function, handle_info: 2}
+  @spec handle_info(
+          {{Scenic.PubSub, :data}, {:frame_state, FrameFirmware.FrameStateManager.State.t(), integer()}},
+          Scenic.Scene.t()
+        ) :: {:noreply, Scenic.Scene.t()}
   def handle_info(
         {{Scenic.PubSub, :data}, {:frame_state, frame_state, _ts}},
         %Scenic.Scene{assigns: %{graph: graph}} = scene

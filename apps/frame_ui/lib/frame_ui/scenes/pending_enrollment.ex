@@ -10,14 +10,15 @@ defmodule FrameUI.Scenes.PendingEnrollment do
 
   @spec build_graph(Scenic.Scene.t()) :: Scenic.Graph.t()
   def build_graph(%Scenic.Scene{} = scene) do
-    Scenic.Graph.modify(
-      scene.assigns.graph,
+    scene.assigns.graph
+    |> Scenic.Graph.modify(
       :main_group,
       fn group ->
-        Primitive.put(group, fn graph ->
-          Primitives.text(graph, "Pending enrollment", translate: {@margin, @margin})
-        end)
+        Primitive.put(group, [])
       end
     )
+    |> Scenic.Graph.add_to(:main_group, fn graph ->
+      Primitives.text(graph, "Pending enrollment", translate: {@margin, @margin}, fill: :red)
+    end)
   end
 end
