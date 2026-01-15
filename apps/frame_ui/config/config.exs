@@ -8,7 +8,7 @@ config :scenic, :assets, module: FrameUI.Assets
 # Configure the main viewport for the Scenic application
 config :frame_ui, :viewport,
   name: :main_viewport,
-  size: {641, 480},
+  size: {1920, 1080},
   theme: :dark,
   default_scene: FrameUI.RootScene,
   drivers: [
