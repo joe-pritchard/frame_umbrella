@@ -2,10 +2,10 @@
 
 **To run locally:**
 
-`export MIX_TARGET=host`
-`mix deps.get`
-`mix compile`
-`iex -S mix`
+* `export MIX_TARGET=host`
+* `mix deps.get`
+* `mix compile`
+* `iex -S mix`
 
 ```
 state = %FrameFirmware.FrameStateManager.State{wifi_configured?: false, ssid: "test_ssid"}
@@ -14,9 +14,9 @@ send(FrameUI.PubSub.FrameState, {:frame_state, state})
 
 **To build:**
 
-`export MIX_TARGET=rpi0_2`
-`mix deps.get`
-`mix compile && cd ./apps/frame_firmware/ && mix firmware && mix upload <frame_ip_address> && cd ../..`
+* `export MIX_TARGET=rpi0_2`
+* `mix deps.get`
+* `mix compile && cd ./apps/frame_firmware/ && mix firmware && mix upload <frame_ip_address> && cd ../..`
 
 or
 
