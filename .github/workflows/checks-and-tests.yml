@@ -15,7 +15,6 @@ jobs:
       MIX_ENV: test
       ELIXIR_VERSION: '1.19.3'
       OTP_VERSION: '28.1'
-      SCENIC_LOCAL_TARGET: 'glfw'
       MIX_TARGET: 'host'
     
     steps:
@@ -26,6 +25,11 @@ jobs:
       with:
         elixir-version: ${{ env.ELIXIR_VERSION }}
         otp-version: ${{ env.OTP_VERSION }}
+
+    - name: Install Scenic dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y pkgconf libglfw3 libglfw3-dev libglew2.0 libglew-dev
     
     - name: Restore dependencies cache
       uses: actions/cache@v4
