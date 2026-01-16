@@ -2,6 +2,7 @@
 
 **To run locally:**
 
+* `export SCENIC_LOCAL_TARGET=glfw # only needed on windows or CI`
 * `export MIX_TARGET=host`
 * `mix deps.get`
 * `mix compile`

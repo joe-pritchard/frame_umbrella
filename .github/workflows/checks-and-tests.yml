@@ -15,6 +15,8 @@ jobs:
       MIX_ENV: test
       ELIXIR_VERSION: '1.19.3'
       OTP_VERSION: '28.1'
+      SCENIC_LOCAL_TARGET: 'glfw'
+      MIX_TARGET: 'host'
     
     steps:
     - uses: actions/checkout@v4
@@ -29,8 +31,8 @@ jobs:
       uses: actions/cache@v4
       with:
         path: deps
-        key: ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-mix-${{ hashFiles('**/mix.lock') }}
-        restore-keys: ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-mix-
+        key: ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-mix-${{ env.MIX_TARGET }}-${{ hashFiles('**/mix.lock') }}
+        restore-keys: ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-mix-${{ env.MIX_TARGET }}-
     
     - name: Install dependencies
       run: mix deps.get
@@ -39,9 +41,9 @@ jobs:
       uses: actions/cache@v4
       with:
         path: _build
-        key: ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-build-${{ hashFiles('**/mix.lock') }}
+        key: ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-build-${{ env.MIX_TARGET }}-${{ hashFiles('**/mix.lock') }}
         restore-keys: |
-          ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-build-
+          ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-build-${{ env.MIX_TARGET }}-
     
     - name: Check formatting
       run: mix format --check-formatted
